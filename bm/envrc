@@ -1,0 +1,30 @@
+## $HOME/.envrc.osx
+
+## ## https://help.zscaler.com/zia/adding-custom-certificate-application-specific-trust-store
+## https://community.zscaler.com/t/installing-tls-ssl-root-certificates-to-non-standard-environments/7261
+which go &>/dev/null || brew install golang
+which aws &>/dev/null || brew install awscli
+which aws-sso-util &>/dev/null || brew install aws-sso-util # python3 -m pip install aws-sso-util
+which zcli &>/dev/null || (git clone git@bitbucket.org:persgroep/zcli.git && cd zcli && go install && zcli environment)
+
+## Configure AWS SSO cli
+## https://github.com/benkehoe/aws-sso-util ##
+
+CONFIG_FILE=$HOME/.aws/config
+if [ ! -f "$CONFIG_FILE" ]; then
+  export AWS_CA_BUNDLE="$CERT_FILE"
+  export AWS_DEFAULT_REGION=eu-west-1
+  export AWS_DEFAULT_SSO_START_URL=https://d-93677093a7.awsapps.com/start
+  export AWS_DEFAULT_SSO_REGION=eu-west-1
+  export AWS_PROFILE=default
+  aws-sso-util login
+  aws-sso-util configure populate
+fi
+
+# https://persgroep-it.slack.com/archives/C01M1DLEAEM/p1680680655298519?thread_ts=1680679281.150849&cid=C01M1DLEAEM
+unset AWS_DEFAULT_REGION
+export AWS_PROFILE=Berlingske-Media-DevOps.dpg-administrator-cf
+aws sts get-caller-identity &> /dev/null || aws-sso-util login
+
+# export TF_LOG_CORE=TRACE
+# export TF_LOG_PROVIDER=TRACE
