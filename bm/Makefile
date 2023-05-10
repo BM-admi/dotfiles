@@ -10,6 +10,7 @@ softwareupdate:
 install-configs:
 	install -v gitconfig $(HOME)/.gitconfig	
 	install -v envrc $(HOME)/.envrc
+	install -v terraformrc $(HOME)/.terraformrc
 	install -v aliases.zsh $(HOME)/.oh-my-zsh/custom/aliases.zsh
 	install -v zscaler_root.pem $(HOME)/.zcli/zscaler_root.pem
 	

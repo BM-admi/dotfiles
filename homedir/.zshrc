@@ -30,7 +30,14 @@ export DISABLE_AUTO_TITLE="true"
 
 # Which plugins would you like to load? (plugins can be found in ~/.dotfiles/oh-my-zsh/plugins/*)
 # Example format: plugins=(rails git textmate ruby lighthouse)
-plugins=(colorize compleat dirpersist autojump git gulp history cp)
+plugins=(
+  colorize compleat dirpersist autojump git gulp history cp
+  git-extras
+  python
+  terraform
+  aws
+  direnv
+)
 
 source $ZSH/oh-my-zsh.sh
 
@@ -52,3 +59,5 @@ unsetopt correct
 
 # run fortune on new terminal :)
 # fortune
+
+[[ "$TERM_PROGRAM" == "vscode" ]] && . "$(code --locate-shell-integration-path zsh)"
