@@ -5,11 +5,12 @@
 which go &>/dev/null || brew install golang
 which aws &>/dev/null || brew install awscli
 which aws-sso-util &>/dev/null || brew install aws-sso-util # python3 -m pip install aws-sso-util
-which zcli &>/dev/null || (git clone git clone https://atrakic@bitbucket.org/persgroep/zcli.git && cd zcli && go install && zcli environment)
+which zcli &>/dev/null || (git clone https://bitbucket.org/persgroep/zcli.git && cd zcli && go install && zcli environment)
 
 ## Configure AWS SSO cli
 ## https://github.com/benkehoe/aws-sso-util ##
 
+CERT_FILE=$HOME/.zcli/zscaler_root.pem
 CONFIG_FILE=$HOME/.aws/config
 if [ ! -f "$CONFIG_FILE" ]; then
   export AWS_CA_BUNDLE="$CERT_FILE"

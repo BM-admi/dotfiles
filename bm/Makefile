@@ -28,4 +28,5 @@ install-tools-configs:
 	install -d $(HOME)/.terraform.d/plugin-cache
 	install -v terraformrc $(HOME)/.terraformrc
 	install -v aliases.zsh $(HOME)/.oh-my-zsh/custom/aliases.zsh
+	install -d $(HOME)/.zcli
 	install -v zscaler_root.pem $(HOME)/.zcli/zscaler_root.pem
