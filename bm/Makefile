@@ -23,7 +23,7 @@ softwareupdate:
 install-tools-configs:
 	echo ":: $@ :: "
 	if [ ! -f "$(HOME)/.ssh/id_rsa" ]; then ssh-keygen -t rsa; fi 
-	pip3 install -U pytest boto3 pre-commit checkov requests
+	pip3 install -U -r requirements.txt
 	install -v envrc $(HOME)/.envrc
 	install -d $(HOME)/.terraform.d/plugin-cache
 	install -v terraformrc $(HOME)/.terraformrc

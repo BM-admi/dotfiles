@@ -1,0 +1,8 @@
+pytest
+black
+pre-commit
+boto3
+pre-commit
+checkov
+requests
+diagram
