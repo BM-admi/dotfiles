@@ -1,6 +1,6 @@
 MAKEFLAGS += --silent
 
-all: init softwareupdate brew install-tools-configs
+all: init softwareupdate brew install
 	echo ":: Done ::"
 
 init:
@@ -18,13 +18,16 @@ softwareupdate:
 	echo ":: $@ :: "
 	touch /tmp/.com.apple.dt.CommandLineTools.installondemand.in-progress
 	softwareupdate -i -a
-	rm /tmp/.com.apple.dt.CommandLineTools.installondemand.in-progress
+	rm -rf /tmp/.com.apple.dt.CommandLineTools.installondemand.in-progress
 	
-install-tools-configs:
+install:
 	echo ":: $@ :: "
 	if [ ! -f "$(HOME)/.ssh/id_rsa" ]; then ssh-keygen -t rsa; fi 
 	pip3 install -U -r requirements.txt
+	git config --global --add safe.directory '*'
 	install -v envrc $(HOME)/.envrc
+	install -d $(HOME)/bin
+	install -v terraform.sh $(HOME)/bin/terraform.sh
 	install -d $(HOME)/.terraform.d/plugin-cache
 	install -v terraformrc $(HOME)/.terraformrc
 	install -v aliases.zsh $(HOME)/.oh-my-zsh/custom/aliases.zsh

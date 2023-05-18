@@ -1,0 +1,5 @@
+# $HOME/.edgerc
+# chmod 0600
+#
+# https://techdocs.akamai.com/developer/docs/set-up-authentication-credentials
+[papi]

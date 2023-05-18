@@ -2,7 +2,9 @@ pytest
 black
 pre-commit
 boto3
+botocore
 pre-commit
 checkov
 requests
 diagram
+prowler

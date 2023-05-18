@@ -4,7 +4,7 @@
 ## https://community.zscaler.com/t/installing-tls-ssl-root-certificates-to-non-standard-environments/7261
 which go &>/dev/null || brew install golang
 which aws &>/dev/null || brew install awscli
-which aws-sso-util &>/dev/null || brew install aws-sso-util # python3 -m pip install aws-sso-util
+which aws-sso-util &>/dev/null || brew install aws-sso-util
 which zcli &>/dev/null || (git clone https://bitbucket.org/persgroep/zcli.git && cd zcli && go install && zcli environment)
 
 ## Configure AWS SSO cli
