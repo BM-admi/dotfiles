@@ -46,6 +46,8 @@ main() {
           "${terraform[@]}" "${command}" -compact-warnings "${@}"
           ;;
       "apply")
+          "${terraform[@]}" fmt
+          "${terraform[@]}" validate
           "${terraform[@]}" init -upgrade
           "${terraform[@]}" plan -compact-warnings
           "${terraform[@]}" "${command}" -auto-approve "${@}"
