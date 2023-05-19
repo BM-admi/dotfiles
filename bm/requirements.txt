@@ -8,3 +8,5 @@ checkov
 requests
 diagram
 prowler
+httpie
+httpie-edgegrid

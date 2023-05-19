@@ -25,6 +25,7 @@ install:
 	if [ ! -f "$(HOME)/.ssh/id_rsa" ]; then ssh-keygen -t rsa; fi 
 	pip3 install -U -r requirements.txt
 	git config --global --add safe.directory '*'
+	akamai install terraform
 	install -v envrc $(HOME)/.envrc
 	install -d $(HOME)/bin
 	install -v terraform.sh $(HOME)/bin/terraform.sh
