@@ -38,6 +38,11 @@ main() {
   command="$1"
   shift 1
   case "${command}" in
+      "validate")
+          "${terraform[@]}" fmt
+          "${terraform[@]}" init -upgrade
+          "${terraform[@]}" "${command}" "${@}"
+          ;;
       "init")
           "${terraform[@]}" "${command}" -upgrade "${@}"
           ;;
@@ -46,8 +51,6 @@ main() {
           "${terraform[@]}" "${command}" -compact-warnings "${@}"
           ;;
       "apply")
-          "${terraform[@]}" fmt
-          "${terraform[@]}" validate
           "${terraform[@]}" init -upgrade
           "${terraform[@]}" plan -compact-warnings
           "${terraform[@]}" "${command}" -auto-approve "${@}"
