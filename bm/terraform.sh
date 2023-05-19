@@ -2,7 +2,7 @@
 
 set -e
 
-TERRAFORM_VERSION=${TERRAFORM_VERSION:-"latest"}
+TERRAFORM_VERSION=${TERRAFORM_VERSION:-latest}
 
 declare -a terraform=(docker run \
   --name terraform-cli \
@@ -28,8 +28,8 @@ declare -a terraform=(docker run \
   --env TF_LOG_PATH="${TF_LOG_PATH}" \
   --env TF_REGISTRY_CLIENT_TIMEOUT="${TF_REGISTRY_CLIENT_TIMEOUT}" \
   --env TF_CLI_CONFIG_FILE="${TF_CLI_CONFIG_FILE}" \
-  --env AWS_PROFILE="${AWS_PROFILE:-'default'}" \
-  --env AWS_DEFAULT_REGION="${AWS_DEFAULT_REGION:-'eu-west-1'}" \
+  --env AWS_PROFILE="${AWS_PROFILE:-default}" \
+  --env AWS_DEFAULT_REGION="${AWS_DEFAULT_REGION:-eu-west-1}" \
   --log-driver none \
   hashicorp/terraform:"${TERRAFORM_VERSION}"
 )
