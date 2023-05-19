@@ -11,14 +11,13 @@ declare -a terraform=(docker run \
   --workdir /tmp/workspace/terraform \
   --volume "$(pwd)":/tmp/workspace/terraform \
   --volume "$(cd .. && pwd)":/tmp/workspace/work \
-  --volume "${HOME}/.edgerc:/root/.edgerc" \
-  --volume "${HOME}/.zcli/zscaler_root.pem:/usr/local/share/ca-certificates/zscaler_root.pem" \
-  --volume "${HOME}/.terraformrc:/root/.terraformrc" \
   --volume "${HOME}/.terraform.d:/root/.terraform.d" \
-  --volume "${HOME}/.gitconfig:/root/.gitconfig" \
+  --volume "${HOME}/.edgerc:/root/.edgerc:ro" \
+  --volume "${HOME}/.terraformrc:/root/.terraformrc:ro" \
+  --volume "${HOME}/.gitconfig:/root/.gitconfig:ro" \
   --volume "${HOME}/.aws:/root/.aws:ro" \
   --volume "${HOME}/.ssh:/root/.ssh:ro" \
-  --env SSH_AUTH_SOCK=${SSH_AUTH_SOCK} \
+  --env SSH_AUTH_SOCK="${SSH_AUTH_SOCK}" \
   --env TF_IN_AUTOMATION=1 \
   --env TF_CLI_ARGS="${TF_CLI_ARGS}" \
   --env TF_DATA_DIR="${TF_DATA_DIR}" \
@@ -36,7 +35,6 @@ declare -a terraform=(docker run \
 )
 
 main() {
-  [ ! -f "$HOME/.edgerc" ] && { echo "Error: you need edgerc file "; exit 1; }
   command="$1"
   shift 1
   case "${command}" in
