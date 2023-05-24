@@ -2,18 +2,18 @@
 
 set -e
 
+PWD="$(pwd -P)"
 TERRAFORM_VERSION=${TERRAFORM_VERSION:-latest}
 
 declare -a terraform=(docker run \
   --name terraform-cli \
   --interactive \
   --rm \
-  --workdir /tmp/workspace/terraform \
-  --volume "$(pwd)":/tmp/workspace/terraform \
-  --volume "$(cd .. && pwd)":/tmp/workspace/work \
+  --workdir /terraform/workspace/default \
+  --volume "$(pwd)":/terraform/workspace/default \
   --volume "${HOME}/.terraform.d:/root/.terraform.d" \
-  --volume "${HOME}/.edgerc:/root/.edgerc:ro" \
   --volume "${HOME}/.terraformrc:/root/.terraformrc:ro" \
+  --volume "${HOME}/.edgerc:/root/.edgerc:ro" \
   --volume "${HOME}/.gitconfig:/root/.gitconfig:ro" \
   --volume "${HOME}/.aws:/root/.aws:ro" \
   --volume "${HOME}/.ssh:/root/.ssh:ro" \
@@ -35,6 +35,10 @@ declare -a terraform=(docker run \
 )
 
 main() {
+  if [ $# -eq 0 ]; then
+    echo "No argument provided. Try: validate, init, plan, apply, destroy."
+    exit 0
+  fi
   command="$1"
   shift 1
   case "${command}" in
@@ -52,13 +56,16 @@ main() {
           ;;
       "apply")
           "${terraform[@]}" init -upgrade
-          "${terraform[@]}" plan -compact-warnings
-          "${terraform[@]}" "${command}" -auto-approve "${@}"
+          "${terraform[@]}" plan -compact-warnings -out=tfplan
+          "${terraform[@]}" "${command}" -lock=false -compact-warnings -auto-approve tfplan "${@}"
           ;;
       "destroy")
           "${terraform[@]}" init -upgrade
           "${terraform[@]}" plan -compact-warnings
           "${terraform[@]}" "${command}" "${@}"
+          ;;
+      "clean")
+          rm -rf "${PWD}"/.terraform
           ;;
       *)
           "${terraform[@]}" "${command}" "${@}"
