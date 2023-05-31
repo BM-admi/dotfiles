@@ -2,8 +2,8 @@
 
 set -e
 
-PWD="$(pwd -P)"
 TERRAFORM_VERSION=${TERRAFORM_VERSION:-latest}
+PWD="$(pwd -P)"
 
 declare -a terraform=(docker run \
   --name terraform-cli \
@@ -39,37 +39,47 @@ main() {
     echo "No argument provided. Try: validate, init, plan, apply, destroy."
     exit 0
   fi
+
+  export DOCKER_DEFAULT_PLATFORM="${DOCKER_DEFAULT_PLATFORM:-linux/amd64}"
   command="$1"
   shift 1
   case "${command}" in
-      "validate")
-          "${terraform[@]}" fmt
-          "${terraform[@]}" init -upgrade
-          "${terraform[@]}" "${command}" "${@}"
-          ;;
-      "init")
-          "${terraform[@]}" "${command}" -upgrade "${@}"
-          ;;
-      "plan")
-          "${terraform[@]}" init -upgrade
-          "${terraform[@]}" "${command}" -compact-warnings "${@}"
-          ;;
-      "apply")
-          "${terraform[@]}" init -upgrade
-          "${terraform[@]}" plan -compact-warnings -out=tfplan
-          "${terraform[@]}" "${command}" -lock=false -compact-warnings -auto-approve tfplan "${@}"
-          ;;
-      "destroy")
-          "${terraform[@]}" init -upgrade
-          "${terraform[@]}" plan -compact-warnings
-          "${terraform[@]}" "${command}" "${@}"
-          ;;
-      "clean")
-          rm -rf "${PWD}"/.terraform
-          ;;
-      *)
-          "${terraform[@]}" "${command}" "${@}"
-          ;;
+    "validate")
+      "${terraform[@]}" fmt
+      [ -f .terraform/terraform.tfstate ] || "${terraform[@]}" init -upgrade
+      tflint --chdir "$PWD"
+      "${terraform[@]}" "${command}" "${@}"
+      ;;
+    "init")
+      [ -f .terraform/terraform.tfstate ] || "${terraform[@]}" "${command}" -upgrade "${@}"
+      ;;
+    "plan")
+      [ -f .terraform/terraform.tfstate ] || "${terraform[@]}" init -upgrade
+      "${terraform[@]}" "${command}" -compact-warnings "${@}"
+      ;;
+    "apply")
+      [ -f .terraform/terraform.tfstate ] || "${terraform[@]}" init -upgrade
+      "${terraform[@]}" plan -compact-warnings -out=tfplan
+      "${terraform[@]}" "${command}" -lock=false -compact-warnings -auto-approve tfplan "${@}"
+      ;;
+    "destroy")
+      [ -f .terraform/terraform.tfstate ] || "${terraform[@]}" init -upgrade
+      "${terraform[@]}" plan -compact-warnings
+      "${terraform[@]}" "${command}" "${@}"
+      ;;
+    "state"|"show"|"output")
+      [ -f .terraform/terraform.tfstate ] || "${terraform[@]}" init -upgrade
+      "${terraform[@]}" "${command}" "${@}"
+      ;;
+    "version"|"console"|"fmt"|"force-unlock")
+      "${terraform[@]}" "${command}" "${@}"
+      ;;
+    "clean")
+      rm -rf "${PWD}"/.terraform
+      ;;
+    *)
+      "${command}" "${@}"
+      ;;
   esac
 }
 
