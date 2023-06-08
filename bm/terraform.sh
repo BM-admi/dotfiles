@@ -51,7 +51,7 @@ main() {
       "${terraform[@]}" "${command}" "${@}"
       ;;
     "init")
-      [ -f .terraform/terraform.tfstate ] || "${terraform[@]}" "${command}" -upgrade "${@}"
+      "${terraform[@]}" "${command}" -upgrade "${@}"
       ;;
     "plan")
       [ -f .terraform/terraform.tfstate ] || "${terraform[@]}" init -upgrade
