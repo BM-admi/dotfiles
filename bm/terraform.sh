@@ -9,8 +9,8 @@ declare -a terraform=(docker run \
   --name terraform-cli \
   --interactive \
   --rm \
-  --workdir /terraform/workspace/default \
-  --volume "$(pwd)":/terraform/workspace/default \
+  --workdir /terraform"$(PWD)" \
+  --volume "$(PWD)":/terraform"$(PWD)" \
   --volume "${HOME}/.terraform.d:/root/.terraform.d" \
   --volume "${HOME}/.terraformrc:/root/.terraformrc:ro" \
   --volume "${HOME}/.edgerc:/root/.edgerc:ro" \
@@ -59,12 +59,10 @@ main() {
       ;;
     "apply")
       [ -f .terraform/terraform.tfstate ] || "${terraform[@]}" init -upgrade
-      "${terraform[@]}" plan -compact-warnings -out=tfplan
-      "${terraform[@]}" "${command}" -lock=false -compact-warnings -auto-approve tfplan "${@}"
+      "${terraform[@]}" "${command}" -lock=false -auto-approve "${@}"
       ;;
     "destroy")
       [ -f .terraform/terraform.tfstate ] || "${terraform[@]}" init -upgrade
-      "${terraform[@]}" plan -compact-warnings
       "${terraform[@]}" "${command}" "${@}"
       ;;
     "state"|"show"|"output")
