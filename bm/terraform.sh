@@ -9,14 +9,7 @@ declare -a terraform=(docker run \
   --name terraform-cli \
   --interactive \
   --rm \
-  --workdir /terraform"$(PWD)" \
-  --volume "$(PWD)":/terraform"$(PWD)" \
-  --volume "${HOME}/.terraform.d:/root/.terraform.d" \
-  --volume "${HOME}/.terraformrc:/root/.terraformrc:ro" \
-  --volume "${HOME}/.edgerc:/root/.edgerc:ro" \
-  --volume "${HOME}/.gitconfig:/root/.gitconfig:ro" \
-  --volume "${HOME}/.aws:/root/.aws:ro" \
-  --volume "${HOME}/.ssh:/root/.ssh:ro" \
+  --env TF_PLUGIN_CACHE_DIR=/.terraform.d/plugin-cache \
   --env SSH_AUTH_SOCK="${SSH_AUTH_SOCK}" \
   --env TF_IN_AUTOMATION=1 \
   --env TF_CLI_ARGS="${TF_CLI_ARGS}" \
@@ -30,9 +23,18 @@ declare -a terraform=(docker run \
   --env TF_CLI_CONFIG_FILE="${TF_CLI_CONFIG_FILE}" \
   --env AWS_PROFILE="${AWS_PROFILE:-default}" \
   --env AWS_DEFAULT_REGION="${AWS_DEFAULT_REGION:-eu-west-1}" \
+  --workdir /terraform"$(PWD)" \
+  --volume "$(PWD)":/terraform"$(PWD)" \
+  --volume "${HOME}/.edgerc:/root/.edgerc:ro" \
+  --volume "${HOME}/.gitconfig:/root/.gitconfig:ro" \
+  --volume "${HOME}/.aws:/root/.aws:ro" \
+  --volume "${HOME}/.ssh:/root/.ssh:ro" \
+  --volume "/tmp/.terraform.d/plugin-cache:/.terraform.d/plugin-cache" \
   --log-driver none \
   hashicorp/terraform:"${TERRAFORM_VERSION}"
 )
+#  --volume "${HOME}/.terraform.d:/root/.terraform.d" \
+#  --volume "${HOME}/.terraformrc:/root/.terraformrc:ro" \
 
 main() {
   if [ $# -eq 0 ]; then
@@ -46,12 +48,12 @@ main() {
   case "${command}" in
     "validate")
       "${terraform[@]}" fmt
-      [ -f .terraform/terraform.tfstate ] || "${terraform[@]}" init -upgrade
+      [ -f .terraform/terraform.tfstate ] || "${terraform[@]}" init -upgrade -reconfigure
       tflint --chdir "$PWD"
       "${terraform[@]}" "${command}" "${@}"
       ;;
     "init")
-      "${terraform[@]}" "${command}" -upgrade "${@}"
+      "${terraform[@]}" "${command}" -upgrade -reconfigure "${@}"
       ;;
     "plan")
       [ -f .terraform/terraform.tfstate ] || "${terraform[@]}" init -upgrade
