@@ -23,6 +23,7 @@ if [ ! -f "$CONFIG_FILE" ]; then
 fi
 
 # https://persgroep-it.slack.com/archives/C01M1DLEAEM/p1680680655298519?thread_ts=1680679281.150849&cid=C01M1DLEAEM
+export AWS_PAGER=""
 unset AWS_DEFAULT_REGION
 export AWS_PROFILE=Berlingske-Media-DevOps.dpg-administrator-cf
 aws sts get-caller-identity &> /dev/null || aws-sso-util login
