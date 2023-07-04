@@ -5,11 +5,16 @@ set -e
 TERRAFORM_VERSION=${TERRAFORM_VERSION:-latest}
 PWD="$(pwd -P)"
 
+# https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-envvars.html
+TF_PLUGIN_CACHE_DIR="$HOME/.terraform.d/plugin-cache"
+mkdir -p "${TF_PLUGIN_CACHE_DIR}"
+
 declare -a terraform=(docker run \
   --name terraform-cli \
   --interactive \
   --rm \
-  --env TF_PLUGIN_CACHE_DIR=/.terraform.d/plugin-cache \
+  --env TF_PLUGIN_CACHE_MAY_BREAK_DEPENDENCY_LOCK_FILE=1 \
+  --env TF_PLUGIN_CACHE_DIR="/tmp/plugin-cache" \
   --env SSH_AUTH_SOCK="${SSH_AUTH_SOCK}" \
   --env TF_IN_AUTOMATION=1 \
   --env TF_CLI_ARGS="${TF_CLI_ARGS}" \
@@ -23,18 +28,20 @@ declare -a terraform=(docker run \
   --env TF_CLI_CONFIG_FILE="${TF_CLI_CONFIG_FILE}" \
   --env AWS_PROFILE="${AWS_PROFILE:-default}" \
   --env AWS_DEFAULT_REGION="${AWS_DEFAULT_REGION:-eu-west-1}" \
-  --workdir /terraform"$(PWD)" \
-  --volume "$(PWD)":/terraform"$(PWD)" \
+  #--env AWS_CA_BUNDLE="/root/.aws/zscaler.pem"
+  --workdir "$(PWD)" \
+  --volume "$(PWD):$(PWD)" \
   --volume "${HOME}/.edgerc:/root/.edgerc:ro" \
   --volume "${HOME}/.gitconfig:/root/.gitconfig:ro" \
   --volume "${HOME}/.aws:/root/.aws:ro" \
+  # workarround for ZSCALER http requests
+  # sudo cp -p /opt/homebrew/etc/ca-certificates/cert.pem /etc/ssl/certs
   --volume "${HOME}/.ssh:/root/.ssh:ro" \
-  --volume "/tmp/.terraform.d/plugin-cache:/.terraform.d/plugin-cache" \
+  --volume "/etc/ssl/certs:/etc/ssl/certs:ro" \
+  --volume "$TF_PLUGIN_CACHE_DIR:/tmp/plugin-cache" \
   --log-driver none \
   hashicorp/terraform:"${TERRAFORM_VERSION}"
 )
-#  --volume "${HOME}/.terraform.d:/root/.terraform.d" \
-#  --volume "${HOME}/.terraformrc:/root/.terraformrc:ro" \
 
 main() {
   if [ $# -eq 0 ]; then
